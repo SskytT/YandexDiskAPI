@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="" method="GET" onsubmit="updateAction(event)">
+    <label for="public_key">Введите публичную ссылку или публичный ключ:</label>
+    <input type="text" name="public_key" id="public_key" maxlength="1000" required>
+    <br>
+    <label for="path">Введите путь для файла:</label>
+    <input type="text" name="path" id="path" maxlength="1000">
+    <br>
+    <button type="submit">Получить файлы</button>
+</form>
+
+<script>
+function toBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+}
+
+function updateAction(event) {
+    event.preventDefault(); // Предотвращаем отправку формы
+
+    const publicKey = document.getElementById('public_key').value.trim();
+    let path = document.getElementById('path').value.trim();
+
+    // Если path не указан, устанавливаем значение по умолчанию
+    if (!path) {
+        path = '/'; // Или любой другой дефолтный путь
+    }
+
+    // Кодируем в base64
+    const encodedPublicKey = btoa(encodeURIComponent(publicKey));
+    const encodedPath = btoa(encodeURIComponent(path));
+
+    // Формируем новый URL с параметрами в пути
+    const actionUrl = `/file/${encodedPublicKey}/${encodedPath}/`;
+
+    // Перенаправляем на сформированный URL
+    window.location.href = actionUrl;
+}
+</script>
+
+
+
+
+
+</body>
+</html>
