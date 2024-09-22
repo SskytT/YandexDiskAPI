@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'YandexDiskReviewer.apps.YandexdiskreviewerConfig'
+    'YandexDiskManager.apps.YandexDiskManagerConfig',
+    'YandexDiskUI.apps.YandexDiskUIConfig',
 ]
 
 MIDDLEWARE = [

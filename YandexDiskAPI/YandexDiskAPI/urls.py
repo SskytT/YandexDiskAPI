@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('YandexDiskReviewer.urls')),
+    path('api/v1/', include('YandexDiskManager.urls')),
+    path('', include('YandexDiskUI.urls')),
 ]
