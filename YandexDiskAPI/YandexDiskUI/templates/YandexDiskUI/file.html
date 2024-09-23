@@ -7,9 +7,8 @@
     <link rel="stylesheet" href="{% static 'css/file.css' %}">
 </head>
 <body>
-    <button id="backButton">Назад</button>
-
     <form id="fileForm">
+        <button id="backButton">Назад</button>
         <div class="form-group form-group-filter">
             <label for="public_key">Публичная ссылка или ключ:</label>
             <input type="text" name="public_key" id="public_key" maxlength="1000" required>
@@ -32,6 +31,7 @@
     </div>
     <ul id="file-list"></ul>
     <script>
+        //добавление переменных с помощью static ибо в файлах этого уже не сделать
     const staticUrl = "{% url 'file' 'public_key' 'path' %}";
     const downloadUrl = "{% url 'download_file' 'public_key' 'path' %}";
     const fileIcons = {
