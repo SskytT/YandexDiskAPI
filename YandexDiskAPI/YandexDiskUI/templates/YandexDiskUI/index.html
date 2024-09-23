@@ -16,9 +16,6 @@
 </form>
 
 <script>
-function toBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-}
 
 function updateAction(event) {
     event.preventDefault(); // Предотвращаем отправку формы
@@ -36,8 +33,8 @@ function updateAction(event) {
     const encodedPath = btoa(encodeURIComponent(path));
 
     // Формируем новый URL с параметрами в пути
-    const actionUrl = `/file/${encodedPublicKey}/${encodedPath}/`;
-
+    const actionUrlTemplate = "{% url 'index_file' 'public_key_placeholder' 'path_placeholder' %}";
+    const actionUrl = actionUrlTemplate.replace('public_key_placeholder', encodeURIComponent(encodedPublicKey)).replace('path_placeholder', encodeURIComponent(encodedPath));
     // Перенаправляем на сформированный URL
     window.location.href = actionUrl;
 }

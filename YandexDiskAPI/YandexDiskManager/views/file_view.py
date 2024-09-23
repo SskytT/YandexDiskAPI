@@ -14,7 +14,8 @@ class FileView(View):
         dict_result = YandexDiskFile.get_file(public_key=public_key, path=path)
         return JsonResponse(dict_result)
 
-    def download(self, request, *args, **kwargs):
+    @staticmethod
+    def download(request, *args, **kwargs):
         public_key = kwargs.get('public_key', None)
         path = kwargs.get('path', None)
         public_key = base64.b64decode(public_key).decode('utf-8')
