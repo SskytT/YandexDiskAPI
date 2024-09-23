@@ -1,180 +1,45 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Список файлов</title>
+    <link rel="stylesheet" href="{% static 'css/file.css' %}">
 </head>
 <body>
     <button id="backButton">Назад</button>
-    <h1>Список файлов</h1>
 
     <form id="fileForm">
-        <label for="public_key">Введите публичную ссылку или публичный ключ:</label>
-        <input type="text" name="public_key" id="public_key" maxlength="1000" required>
-        <br>
-        <label for="path">Введите путь для файла:</label>
-        <input type="text" name="path" id="path" maxlength="1000">
-        <br>
-        <button type="submit">Получить файлы</button>
+        <div class="form-group form-group-filter">
+            <label for="public_key">Публичная ссылка или ключ:</label>
+            <input type="text" name="public_key" id="public_key" maxlength="1000" required>
+        </div>
+        <div class="form-group">
+            <label for="path">Путь для файла(для ключа):</label>
+            <input type="text" name="path" id="path" maxlength="1000">
+        </div>
+        <button id="searchButton" type="submit">Получить файлы</button>
     </form>
-
+    <h1></h1>
+    <div class="form-group">
+        <label for="filter">Фильтр:</label>
+        <select id="filter">
+            <option value="all">Все</option>
+            <option value="image">Изображения</option>
+            <option value="dir">Папки</option>
+            <option value="default">Документы</option>
+        </select>
+    </div>
     <ul id="file-list"></ul>
-
     <script>
-        async function getPublicKeyAndPath()
-        {
-            const path = window.location.pathname;
-            const regex = /^\/file\/([^\/]+)\/(.+)\/?$/;
-            const match = path.match(regex);
-            if (match)
-            {
-                const publicKey = match[1];
-                let filePath = match[2];
-                if (filePath.endsWith('/'))
-                {
-                    filePath = filePath.slice(0, -1);
-                }
-                console.log('Public Key:', publicKey);
-                console.log('Path:', filePath);
-                try
-                {
-                    let ActionUrl = "{% url 'file' 'public_key' 'path' %}";
-                    ActionUrl = ActionUrl.replace('public_key', publicKey).replace('path', filePath);
-                    console.log(ActionUrl);
-                    const response = await fetch(ActionUrl);
-                    if (response.ok)
-                    {
-                        const data = await response.json();
-                        console.log('Ответ JSON:', data);
-                        if (data.items && Array.isArray(data.items)) {
-                            const fileList = document.getElementById('file-list');
-                            fileList.innerHTML = '';
-                            for (const item of data.items)
-                            {
-                                const li = document.createElement('li');
-                                li.textContent = `Name: ${item.name}`;
-                                if (item.file)
-                                {
-                                    const downloadButton = document.createElement('button');
-                                    downloadButton.textContent = 'Скачать';
-                                    downloadButton.onclick = () => handleDownloadButtonClick(item.file);
-                                    li.appendChild(downloadButton);
-                                }
-                                else
-                                {
-                                    const downloadButton = document.createElement('button');
-                                    downloadButton.textContent = 'Скачать';
-                                    let dataDownload = await getDirDownloadLink(item.path, data.public_key);
-                                    console.log('Ссылка на скачивание:', dataDownload.download);
-                                    downloadButton.onclick = () => handleDownloadButtonClick(dataDownload.download);
-                                    li.appendChild(downloadButton);
-                                }
-                                if (item.type === 'dir')
-                                {
-                                    const openButton = document.createElement('button');
-                                    openButton.textContent = 'Открыть';
-                                    openButton.onclick = () => handleOpenButtonClick(data.public_key, item.path);
-                                    li.appendChild(openButton); // Добавляем кнопку к элементу списка
-                                }
-                                fileList.appendChild(li);
-                            }
-                        }
-                        else
-                        {
-                            console.log('Items не найдены или имеют неправильный формат.');
-                        }
-                    }
-                    else
-                    {
-                        console.log('Ошибка ответа от сервера:', response.status);
-                    }
-                }
-                catch(error)
-                {
-                    console.error('Ошибка запроса:', error);
-                }
-            }
-            else
-            {
-                console.log('URL не соответствует ожидаемому шаблону.');
-            }
-        }
-
-        function handleDownloadButtonClick(file)
-        {
-            const link = document.createElement('a');
-            link.href = file;
-            link.download = '';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        async function getDirDownloadLink(downloadPath, downloadPublicKey)
-        {
-            let ActionDownloadUrl = "{% url 'download_file' 'public_key' 'path' %}";
-            downloadPath = btoa(encodeURIComponent(downloadPath));
-            downloadPublicKey = btoa(encodeURIComponent(downloadPublicKey));
-            ActionDownloadUrl = ActionDownloadUrl.replace('public_key', downloadPublicKey)
-                                                 .replace('path', downloadPath);
-            console.log(ActionDownloadUrl);
-            try
-            {
-                const responseDownload = await fetch(ActionDownloadUrl);
-                if (responseDownload.ok)
-                {
-                    const dataDownload = await responseDownload.json();
-                    console.log(dataDownload.download);
-                    return dataDownload;
-                }
-                else
-                {
-                    console.log('Ошибка ответа от сервера:', response.status);
-                }
-            }
-            catch(error)
-            {
-                console.error('Ошибка запроса:', error);
-            }
-        }
-
-        function handleOpenButtonClick(publicKey, newPath)
-        {
-            newPath = btoa(encodeURIComponent(newPath));
-            publicKey = btoa(encodeURIComponent(publicKey));
-            window.history.pushState({}, '', `/file/${publicKey}/${newPath}/`);
-            getPublicKeyAndPath();
-        }
-
-        document.addEventListener('DOMContentLoaded', function()
-        {
-            getPublicKeyAndPath();
-        });
-
-        window.addEventListener('popstate', function(event)
-        {
-            getPublicKeyAndPath();
-        });
-
-        document.getElementById('backButton').addEventListener('click', function()
-        {
-            window.history.back();
-        });
-        document.getElementById('fileForm').addEventListener('submit', function(event)
-        {
-            event.preventDefault();
-            let newPublicKey = document.getElementById('public_key').value.trim();
-            let newPath = document.getElementById('path').value.trim();
-            if (!newPath)
-            {
-                newPath = '/';
-            }
-            newPublicKey = btoa(encodeURIComponent(newPublicKey));
-            newPath = btoa(encodeURIComponent(newPath));
-            window.history.pushState({}, '', `/file/${newPublicKey}/${newPath}/`);
-            getPublicKeyAndPath();
-        });
+    const staticUrl = "{% url 'file' 'public_key' 'path' %}";
+    const downloadUrl = "{% url 'download_file' 'public_key' 'path' %}";
+    const fileIcons = {
+            'dir': '{% static "icons/dir.png" %}',
+            'image': '{% static "icons/image.png" %}',
+            'default': '{% static "icons/default.png" %}'
+        };
     </script>
-
+    <script src="{% static 'js/file.js' %}"></script>
 </body>
 </html>

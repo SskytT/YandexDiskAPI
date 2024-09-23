@@ -28,6 +28,11 @@ class YandexDiskFile:
                 if "file" in i:
                     item["file"] = i["file"]
                 dict_result['items'].append(item)
+        else:
+            dict_result['items'] = []
+            item = {"name": dict_data["name"],
+                    "path": dict_data["path"], "type": dict_data["type"]}
+            dict_result['items'].append(item)
         return dict_result
 
     @staticmethod
