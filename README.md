@@ -56,3 +56,6 @@
 - **JavaScript**
 - **Docker**
 - **Nginx**
+
+![image](https://github.com/user-attachments/assets/d0a82c0b-7f02-4568-922d-025532498c31)
+
